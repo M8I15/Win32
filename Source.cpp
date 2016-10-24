@@ -142,23 +142,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
 		hBrushBlack = CreateSolidBrush(RGB(0, 0, 0));
 		SelectObject(hDC, hBrushBlack);
-		RoundRect(hDC, 10, 10, 322, 643, 70, 80);    //iPhone7の外枠 
-		Rectangle(hDC, 7, 85, 20, 110);               //マナーモードON/OFFキー 
-		Rectangle(hDC, 7, 135, 20, 185);               //音量＋ボタン 
-		Rectangle(hDC, 7, 200, 20, 250);               //音量－ボタン 
-		Rectangle(hDC, 321, 120, 325, 170);               //電源ボタン 
-
+		RoundRect(hDC, 10, 10, 322, 643, 70, 80);  //iPhone7の外枠
+		Rectangle(hDC, 321, 120, 325, 170);  //iPhone7の電顕ボタン
 
 		hBrushWhite = CreateSolidBrush(RGB(255, 255, 255));
 		SelectObject(hDC, hBrushWhite);
-		Ellipse(hDC, 162, 25, 170, 33);              //中央上部の丸 
-		Ellipse(hDC, 100, 35, 115, 50);              //中央上部下の丸 
-		RoundRect(hDC, 129, 39, 207, 46, 10, 80);
-		Ellipse(hDC, 139, 579, 193, 633);            //ボタンの外丸 
+		Ellipse(hDC, 139, 579, 193, 633);  //iPhone7の中央ボタン外枠
 
 		hBrushYellow = CreateSolidBrush(RGB(255, 255, 0));
 		SelectObject(hDC, hBrushYellow);
-		Rectangle(hDC, 29, 83, 303, 569);            //iPhone7の画面サイズ 
+		Rectangle(hDC, 29, 83, 303, 569);  //iPhone7の画面表示
+
+		hBrushBlack = CreateSolidBrush(RGB(0, 0, 0));
+		SelectObject(hDC, hBrushBlack);
+		Ellipse(hDC, 144, 584, 188, 628);  ////iPhone7の中央ボタンの内枠
 
 
 													 //****  螺旋を描く **** 
@@ -178,9 +175,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 				SelectObject(hDC, hFont);
 
 				logfont.lfHeight = theta*g- 10;   //文字の大きさを指定 
-				if (logfont.lfHeight > 20) g = 0.8;//変化させる大きさ
-				if (logfont.lfHeight > 30) g = 0.85;//
-				if (logfont.lfHeight > 40) g = 0.9;//
+				if (logfont.lfHeight > 20) g = 0.7;//変化させる大きさ
+				if (logfont.lfHeight > 25) g = 0.73;
+				if (logfont.lfHeight > 30) g = 0.75;
+				if (logfont.lfHeight > 35) g = 0.77;
+				if (logfont.lfHeight > 40) g = 0.8;
 
 
 				x1 = pow(a1, theta)*cos(theta) + x0;       //x座標を設定 
@@ -208,20 +207,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 						case 1:
 						case 4:
 						case 6:
-							TextOut(hDC, x1, y1, STR1, _tcslen(STR1));
+							TextOut(hDC, x1, y1, STR1, _tcslen(STR1));//「i」の表示
 							break;
 						case 2:
 						case 5:
-							TextOut(hDC, x1, y1, STR2, _tcslen(STR2));
+							TextOut(hDC, x1, y1, STR2, _tcslen(STR2));//「n」の表示
 							break;
 						case 3:
-							TextOut(hDC, x1, y1, STR3, _tcslen(STR3));
+							TextOut(hDC, x1, y1, STR3, _tcslen(STR3));//「f」の表示
 							break;
 						case 7:
-							TextOut(hDC, x1, y1, STR4, _tcslen(STR4));
+							TextOut(hDC, x1, y1, STR4, _tcslen(STR4));//「t」の表示
 							break;
 						case 8:
-							TextOut(hDC, x1, y1, STR5, _tcslen(STR5));
+							TextOut(hDC, x1, y1, STR5, _tcslen(STR5));//「y」の表示
 							i = 0;
 							break;
 
