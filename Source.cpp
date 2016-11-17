@@ -1,107 +1,47 @@
-/*---------------------------------------------
-Iphone7plus.cpp
------------------------------------------------*/
+/*------------------------------------------------------------------------
+lir01.cpp	(IphoneImageReflection)	 makaronを動かす
+---------------------------------------------------------------------------*/
 
+#include <windows.h>
+#include <tchar.h>
 
-#define _USE_MATH_DEFINES 
-#include <windows.h> 
-#include <tchar.h> 
-#include <math.h> 
+#define	ID_MYTIMER	(32767)
+#define	ID_MYCHILD	(100)
+#define	CHD_WIDTH	(80)	//ピクセル
+#define	CHD_HEIGHT	(80)
 
-
-// プロトタイプ宣言 
+// プロトタイプ宣言
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK ChdProc1(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+//LRESULT CALLBACK ChdProc2(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+BOOL InitApp(HINSTANCE, WNDPROC, LPCTSTR);
+BOOL InitInstance(HINSTANCE, int, LPCTSTR);
 
-// 大域変数 
-static TCHAR szWindowClass[] = _T("iPhone7Plus");
-static TCHAR szTitle[] = _T("iPhone7Plus");
-HINSTANCE	hInst;
+static TCHAR szClassName[] = _T("Animal_Reflect");
+static TCHAR szchClassName[] = _T("child");
+static TCHAR szTitle[] = _T("Animal Reflect");
 
+int img_start_x = 83;
+int img_start_y = 131;
+int img_end_x = 482;
+int img_end_y = 233;
+int min_y = 29;
+int center_screen = 283;
 
-int window_pos_x = 100;
-int window_pos_y = 100;
-int window_width = 350;
-int window_height = 690;
+int count = 1;      //動作を指定
 
-
-int WINAPI WinMain(HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
-	LPSTR pCmdLine,
-	int nCmdShow) {
-
-
-	WNDCLASSEX wcex;
-
-
-	// ウィンドウクラスの情報を設定 
-	wcex.cbSize = sizeof(WNDCLASSEX);				// 構造体サイズ 
-	wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;	// スタイル 
-	wcex.lpfnWndProc = WndProc;							// ウィンドウプロシージャ 
-	wcex.cbClsExtra = 0;									// 拡張情報１ 
-	wcex.cbWndExtra = 0;									// 拡張情報２ 
-	wcex.hInstance = hInstance;							// インスタンスハンドル 
-	wcex.hIcon = (HICON)LoadImage(					// アイコン 
-		NULL,
-		MAKEINTRESOURCE(IDI_APPLICATION),
-		IMAGE_ICON,
-		0,
-		0,
-		LR_DEFAULTSIZE | LR_SHARED
-		);
-	wcex.hIconSm = wcex.hIcon;							// 子アイコン 
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = NULL;							// メニュー名 
-	wcex.lpszClassName = szWindowClass;
-	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
-
-
-	// ウィンドウクラスを登録する 
-	if (!RegisterClassEx(&wcex)) {
-		MessageBox(NULL,
-			_T("ウィンドウの登録に失敗しました"),
-			_T("ウィンドウの登録エラー"),
-			NULL);
-		return 1;
-	}
-
-
-	hInst = hInstance; // インスタンス･ハンドルを大域変数に格納 
-
-
-	// ウィンドウを作成する 
-	HWND hWnd = CreateWindow(
-		szWindowClass,					// ウィンドウクラス名 
-		szTitle,							// タイトルバーに表示する文字列 
-		WS_OVERLAPPEDWINDOW,		// ウィンドウの種類 
-		window_pos_x,								// ウィンドウを表示する位置(X座標) 
-		window_pos_y,								// ウィンドウを表示する位置(Y座標) 
-		window_width,								// ウィンドウの幅 
-		window_height,								// ウィンドウの高さ 
-		NULL,							// 親ウィンドウのウィンドウハンドル 
-		NULL,							// メニューハンドル 
-		hInst,							// インスタンスハンドル 
-		NULL							// その他の作成データ 
-		);
-
-
-	if (!hWnd) {
-		MessageBox(NULL,
-			_T("ウィンドウの作成に失敗しました"),
-			_T("ウィンドウの作成エラー"),
-			NULL);
-		return 1;
-	}
-
-
-	// ウィンドウを表示する 
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
-
-
-	// メッセージ･ループ 
+int WINAPI WinMain(HINSTANCE hCurInst, HINSTANCE hPrevInst, LPSTR lpsCmdLine, int nCmdShow) {
 	MSG msg;
+
+	if (!hPrevInst) {
+		if (!InitApp(hCurInst, WndProc, szClassName)) {
+			return FALSE;
+		}
+	}
+	if (!InitInstance(hCurInst, nCmdShow, szClassName)) {
+		return FALSE;
+	}
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -109,159 +49,232 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	return (int)msg.wParam;
 }
 
+BOOL InitApp(HINSTANCE hInst, WNDPROC WndProc, LPCTSTR szClassName) {
+	WNDCLASS wc;
 
-// ウィンドウプロシージャ 
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = WndProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInst;
+	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = szClassName;
+
+	return (RegisterClass(&wc));
+}
+
+
+BOOL InitInstance(HINSTANCE hInst, int nCmdShow, LPCTSTR szClassName) {
+	HWND hWnd;
+
+	hWnd = CreateWindow(
+		szClassName,
+		szTitle,				//タイトルバーにこの名前が表示されます
+		WS_OVERLAPPEDWINDOW,	//ウィンドウの種類
+		10,						//Ｘ座標　適宜指定する
+		10,						//Ｙ座標　適宜指定する
+		700,					//幅	　適宜指定する
+		400,					//高さ	　適宜指定する
+		NULL,					//親ウィンドウのハンドル、親を作るときはNULL
+		NULL,					//メニューハンドル、クラスメニューを使うときはNULL
+		hInst,					//インスタンスハンドル
+		NULL);
+
+	if (!hWnd) {
+		return FALSE;
+	}
+
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
+
+	return TRUE;
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	RECT		rc;
+	static int 	x = img_start_x;
+	static int 	y = img_start_y;
+	static int 	direction;
+	static HWND		hChdWnd;
+	HINSTANCE		hInst;
+	enum { right, left };
+	int height = 102;
+	int width = 200;
+	bool window_end = false;
 	HDC hDC;
 	HBRUSH  hBrushBlack;
 	HBRUSH  hBrushYellow;
 	HBRUSH  hBrushWhite;
 	PAINTSTRUCT ps;
-	LPCTSTR STR1 = _T("i");
-	LPCTSTR STR2 = _T("n");
-	LPCTSTR STR3 = _T("f");
-	LPCTSTR STR4 = _T("t");
-	LPCTSTR STR5 = _T("y");
-	static LOGFONT logfont;  //フォント情報の構造体 
-	HFONT hFont;
-	int angle = 1;
-	int m = 0;
-
+	
+	int go_x = width / 128 + 1;
+	int go_y = height / 64;
 
 	switch (message) {
+
+	case WM_PAINT:
+
+		hDC = BeginPaint(hWnd, &ps);		// GDI関数による描画を開始する
+
+		//***********************
+		//**iPhoneを横向きにする
+		//***********************
+		hBrushBlack = CreateSolidBrush(RGB(0, 0, 0));
+		SelectObject(hDC, hBrushBlack);
+		RoundRect(hDC, 10, 10, 643, 322, 70, 80);    //iPhone7の外枠
+		Rectangle(hDC, 85, 321, 110, 325);               //マナーモードON/OFFキー
+		Rectangle(hDC, 135, 321, 185, 325);               //音量＋ボタン
+		Rectangle(hDC, 200, 321, 250, 325);               //音量－ボタン
+		Rectangle(hDC, 120, 7, 170, 20);               //電源ボタン
+
+		hBrushWhite = CreateSolidBrush(RGB(255, 255, 255));
+		SelectObject(hDC, hBrushWhite);
+		Ellipse(hDC, 25, 162, 33, 170);              //中央上部の丸
+		Ellipse(hDC, 35, 221, 50, 236);              //中央上部下の丸
+		RoundRect(hDC, 39, 129, 46, 207, 80, 10);
+		Ellipse(hDC, 579, 139, 633, 193);            //ボタンの外丸
+
+		hBrushYellow = CreateSolidBrush(RGB(255, 255, 0));
+		SelectObject(hDC, hBrushYellow);
+		Rectangle(hDC, 83, 29, 571, 303);            //iPhone7の画面サイズ
+
+		SelectObject(hDC, hBrushBlack);
+		Ellipse(hDC, 584, 144, 628, 188);            //ボタンの内丸
+
+		EndPaint(hWnd, &ps);				// GDI関数による描画を終了する
+	
+	}
+
+	switch (message) {
+	
 	case WM_CREATE:
-		ZeroMemory(&logfont, sizeof(logfont));	// フォント情報構造体を０で初期化 
-		logfont.lfCharSet = DEFAULT_CHARSET;	// システムのデフォルト文字セットを使う 
-		wsprintf(logfont.lfFaceName, _T("Times New Roman"));
+		hInst = ((LPCREATESTRUCT)lParam)->hInstance;
+		InitApp(hInst, ChdProc1, szchClassName);
+		hChdWnd = CreateWindow(
+			szchClassName,		// ウィンドウクラス名
+			NULL,				// タイトルバーに表示する文字列
+			WS_CHILD,			// ウィンドウの種類
+			0,					// ウィンドウを表示する位置(X座標）
+			0,					// ウィンドウを表示する位置(Y座標）
+			CHD_WIDTH,			// ウィンドウの幅
+			CHD_HEIGHT,			// ウィンドウの高さ
+			hWnd,				// 親ウィンドウのウィンドウハンドル
+			(HMENU)ID_MYCHILD,	// メニューハンドル
+			hInst,				// インスタンスハンドル
+			NULL				// その他の作成データ
+			);
+
+		ShowWindow(hChdWnd, SW_SHOW);
+		UpdateWindow(hChdWnd);
+
+		SetTimer(hWnd, ID_MYTIMER, 10, NULL);
 		break;
 
-	case WM_PAINT: {
+	case WM_TIMER:
+		GetClientRect(hWnd, &rc);
+		MoveWindow(hChdWnd, x, y, CHD_WIDTH, CHD_HEIGHT, TRUE);
 
+		switch (direction) {
 
-					   hDC = BeginPaint(hWnd, &ps);		// GDI関数による描画を開始する 
+			
+		//右向きに移動する時の処理	
+		case right:
+			if ((x >= img_start_x && y <= img_start_y) && x <= center_screen){
+				x += go_x;     
+				y -= go_y;				
+			}
+			if (y >= min_y && x >= center_screen && y <= img_start_y){
+				x += go_x;
+				y += go_y;
+			}
+			if (x >= img_end_x){
+				direction = left;
+				//count += 1;
+			}
+			break;
 
-					   hBrushBlack = CreateSolidBrush(RGB(0, 0, 0));
-					   SelectObject(hDC, hBrushBlack);
-					   RoundRect(hDC, 10, 10, 322, 643, 70, 80);  //iPhone7の外枠
-					   Rectangle(hDC, 321, 120, 325, 170);  //iPhone7の電顕ボタン
-
-					   hBrushWhite = CreateSolidBrush(RGB(255, 255, 255));
-					   SelectObject(hDC, hBrushWhite);
-					   Ellipse(hDC, 139, 579, 193, 633);  //iPhone7の中央ボタン外枠
-
-					   hBrushYellow = CreateSolidBrush(RGB(255, 255, 0));
-					   SelectObject(hDC, hBrushYellow);
-					   Rectangle(hDC, 29, 83, 303, 569);  //iPhone7の画面表示
-
-					   hBrushBlack = CreateSolidBrush(RGB(0, 0, 0));
-					   SelectObject(hDC, hBrushBlack);
-					   Ellipse(hDC, 144, 584, 188, 628);  ////iPhone7の中央ボタンの内枠
-
-
-					   //****  螺旋を描く **** 
-					   double x0 = 170;//中心
-					   double y0 = 310;
-					   double x1, y1;//変数
-					   double a1 = 1.1;//座標の変化量
-					   double g = 0.6;
-
-					   int i = 1;
-					   MoveToEx(hDC, x0, y0, NULL);     //開始点に移動 
-					   for (double theta = 40.2; theta < 90; theta += 0.1) {
-
-						   while (angle >= 0) {
-							   hFont = CreateFontIndirect(&logfont);
-
-							   SelectObject(hDC, hFont);
-
-							   logfont.lfHeight = theta*g - 10;   //文字の大きさを指定 
-							   if (logfont.lfHeight > 20) g = 0.7;//変化させる大きさ
-							   if (logfont.lfHeight > 25) g = 0.73;
-							   if (logfont.lfHeight > 27) g = 0.74;
-							   if (logfont.lfHeight > 30) g = 0.75;
-							   if (logfont.lfHeight > 32) g = 0.76;
-							   if (logfont.lfHeight > 35) g = 0.77;
-							   if (logfont.lfHeight > 37) g = 0.78;
-							   if (logfont.lfHeight > 38) g = 0.785;
-							   if (logfont.lfHeight > 39) g = 0.79;
-							   if (logfont.lfHeight > 40) g = 0.8;
-
-
-							   x1 = pow(a1, theta)*cos(theta) + x0;       //x座標を設定 
-							   y1 = pow(a1, theta)*sin(theta) + y0;       //y座標を設定 
-
-
-							   //**** 2点から角度を求める **** 
-							   double dx = x0 - x1;
-							   double dy = y0 - y1;
-							   double radian = atan2(dx, dy);
-							   radian = radian*(180 / M_PI) * 10;
-
-
-							   logfont.lfEscapement = radian;     //文字に傾きを付ける 
-
-							   if (m == 0) { //一回目だけforループをbreak
-								   m = 1;
-								   break;
-							   }
-
-							   if ((x1 >= 10 && x1 <= 310) && (y1 >= 50 && y1 <= 600)) {  //枠内のみ螺旋を描く 
-								   SetBkMode(hDC, TRANSPARENT);      //テキストの背景を透明にする 
-								   while (i < 9) {
-									   switch (i) {
-									   case 1:
-									   case 4:
-									   case 6:
-										   TextOut(hDC, x1, y1, STR1, _tcslen(STR1));//「i」の表示
-										   break;
-									   case 2:
-									   case 5:
-										   TextOut(hDC, x1, y1, STR2, _tcslen(STR2));//「n」の表示
-										   break;
-									   case 3:
-										   TextOut(hDC, x1, y1, STR3, _tcslen(STR3));//「f」の表示
-										   break;
-									   case 7:
-										   TextOut(hDC, x1, y1, STR4, _tcslen(STR4));//「t」の表示
-										   break;
-									   case 8:
-										   TextOut(hDC, x1, y1, STR5, _tcslen(STR5));//「y」の表示
-										   i = 0;
-										   break;
-
-
-									   }
-									   i++;
-									   break;
-
-
-								   }
-
-
-								   DeleteObject(hFont); 					// 作成した論理フォントを削除する 
-							   }
-							   break;
-						   }
-
-					   }
-
-					   SelectObject(hDC, hBrushBlack);
-					   Ellipse(hDC, 144, 584, 188, 628);            //ボタンの内丸 
-
-
-
-
-					   EndPaint(hWnd, &ps);				// GDI関数による描画を終了する 
-	}break;
-
+			
+		//左向きに移動する時の処理	
+		case left:
+			if (x <= img_end_x+1 && x >= center_screen && y <= img_end_y){
+				x -= go_x;
+				y += go_y;
+			}
+			if (x <= center_screen && y <= img_end_y && x >= img_start_x){
+				x -= go_x;
+				y -= go_y;
+			}
+			if (x <= img_start_x){
+				direction = right;
+				count += 1;
+			}
+			break;
+		}
+		break;
 
 	case WM_DESTROY:
+		KillTimer(hWnd, ID_MYTIMER);
 		PostQuitMessage(0);
 		break;
 
-
 	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);  		break;
+		return DefWindowProc(hWnd, message, wParam, lParam);
+		break;
 	}
+
 	return 0;
 }
+
+LRESULT CALLBACK ChdProc1(HWND hChdWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	static HBITMAP	hBitmap1;
+	static HBITMAP	hPrevBitmap;
+	HINSTANCE		hInst;
+	PAINTSTRUCT	ps;
+	HDC			hDC;
+	HDC			hCompatDC;
+
+
+	switch (message) {
+	case WM_PAINT:
+		DeleteObject(hBitmap1);
+		hInst = (HINSTANCE)GetWindowLong(hChdWnd, GWL_HINSTANCE);
+
+		hBitmap1 = (HBITMAP)LoadImage(
+			hInst,
+			_T("makaron2.bpm"),
+			IMAGE_BITMAP,
+			0,
+			0,
+			LR_LOADFROMFILE);
+	}
+
+			if (hBitmap1 == NULL) {
+				MessageBox(
+					hChdWnd,
+					_T("ビットマップのロードに失敗しました"),
+					_T("エラー"),
+					MB_OK | MB_ICONWARNING
+					);
+				return 0;
+			}
+
+			hDC = BeginPaint(hChdWnd, &ps);
+			hCompatDC = CreateCompatibleDC(hDC);
+			SelectObject(hCompatDC, hBitmap1);
+
+			BitBlt(hDC, 0, 0, CHD_WIDTH, CHD_HEIGHT, hCompatDC, 0, 0, SRCCOPY);
+
+			DeleteDC(hCompatDC);
+			DeleteObject(hBitmap1);
+			EndPaint(hChdWnd, &ps);
+			break;
+
+		default:
+			return(DefWindowProc(hChdWnd, message, wParam, lParam));
+		}
+	}
+
+
